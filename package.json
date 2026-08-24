@@ -1,0 +1,35 @@
+{
+  "name": "case-board",
+  "version": "1.0.0",
+  "private": true,
+  "description": "เกมไขคดีแบบคลิก — หาเบาะแสจากแฟ้ม ปักหมุดขึ้นกระดานผังคดี ไม่ต้องเขียน SQL",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "verify": "tsx scripts/verify-cases.ts",
+    "postinstall": "node scripts/copy-wasm.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sql.js": "^1.10.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/sql.js": "^1.4.9",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8.4.39",
+    "puppeteer-core": "^25.8.0",
+    "tailwindcss": "^3.4.6",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}

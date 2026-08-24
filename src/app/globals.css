@@ -1,0 +1,689 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design tokens — ธีม "โต๊ะนักสืบใต้แสงโคมไฟ"
+   ============================================================ */
+:root {
+  --font-display: "Special Elite";
+  --font-mono: "IBM Plex Mono";
+  --font-sans: "IBM Plex Sans Thai";
+
+  --desk: #2a2018;
+  --desk-dark: #150f0a;
+  --manila: #e4d2a9;
+  --manila-hi: #f1e3c1;
+  --manila-sh: #c9b487;
+  --ink: #2c2015;
+  --ink-soft: #6e5b41;
+  --stamp: #a8332a;
+  --brass: #c99a3e;
+  --ok: #3e7a52;
+  --term: #151109;
+  --term-fg: #ebdcb6;
+}
+
+@layer base {
+  body {
+    @apply text-ink;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    line-height: 1.65;
+    min-height: 100vh;
+    /* ห้ามใส่ perspective ตรงนี้ — จะทำให้ body กลายเป็น containing block ของลูกที่เป็น
+       position:fixed (ลิ้นชักสมุดบันทึก, ปุ่มลอย) แล้วมันจะยึดกับความสูงเอกสารแทนจอ
+       มุมมอง 3 มิติของอนิเมชัน rise ย้ายไปอยู่ใน transform ของคีย์เฟรมแทน */
+    background:
+      radial-gradient(90% 55% at 50% -8%, #6b4e2e55 0%, transparent 62%),
+      repeating-linear-gradient(96deg, transparent 0 6px, #00000012 6px 7px),
+      linear-gradient(170deg, var(--desk) 0%, var(--desk-dark) 90%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
+  }
+
+  code {
+    font-family: var(--font-mono), monospace;
+    background: #2c201514;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* ---------- กระดาษ manila ซ้อนกันบนโต๊ะ ---------- */
+  .paper {
+    @apply relative rounded-sm px-6 py-5;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 26px, #2c201508 26px 27px),
+      linear-gradient(160deg, var(--manila-hi), var(--manila) 55%, var(--manila-sh));
+    box-shadow:
+      inset 0 1px 0 #ffffff66,
+      0 18px 30px -14px #000000aa,
+      0 44px 70px -30px #000000bb;
+    animation: rise 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  .paper::before,
+  .paper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 2px;
+    background: var(--manila-sh);
+  }
+  .paper::before {
+    transform: translate(4px, 5px) rotate(0.35deg);
+    opacity: 0.55;
+  }
+  .paper::after {
+    transform: translate(9px, 10px) rotate(0.8deg);
+    opacity: 0.3;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono), monospace;
+    @apply mb-1.5 text-[10.5px] uppercase tracking-[2.6px] text-stamp;
+  }
+
+  .paper-title {
+    font-family: var(--font-display), monospace;
+    @apply m-0 mb-1 text-[clamp(19px,3.2vw,25px)] leading-snug;
+  }
+
+  /* ---------- แท็บแฟ้ม ---------- */
+  .folder-tab {
+    font-family: var(--font-mono), monospace;
+    @apply cursor-pointer border-0 px-4 pb-3 pt-2.5 text-xs font-semibold tracking-wide;
+    color: #7c6a4c;
+    background: linear-gradient(180deg, #bca87c, #9c8a62);
+    clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+    transform: translateY(6px);
+    transition: transform 0.18s ease, filter 0.18s ease;
+    box-shadow: inset 0 2px 0 #ffffff33;
+  }
+  .folder-tab:hover {
+    transform: translateY(2px);
+    filter: brightness(1.08);
+  }
+  .folder-tab[data-active="true"] {
+    background: linear-gradient(180deg, var(--manila-hi), var(--manila));
+    color: var(--ink);
+    transform: translateY(0);
+    z-index: 2;
+  }
+  .folder-tab[data-solved="true"] {
+    color: var(--ok);
+  }
+
+  /* ---------- ตราปั๊มปิดคดี ---------- */
+  .stamp-mark {
+    font-family: var(--font-display), monospace;
+    @apply absolute right-4 top-3.5 z-10 px-3.5 py-1 text-[17px] tracking-wide text-stamp;
+    border: 3px double var(--stamp);
+    opacity: 0.88;
+    transform: rotate(-12deg);
+    animation: slam 0.45s cubic-bezier(0.15, 1.5, 0.4, 1) both;
+  }
+
+  /* ---------- ปุ่ม ---------- */
+  .btn {
+    font-family: var(--font-mono), monospace;
+    @apply cursor-pointer rounded-[3px] px-4 py-2 text-[12.5px] font-semibold tracking-wide;
+    border: 1px solid #00000055;
+    background: linear-gradient(180deg, #d9ac4b, #b0842f);
+    color: #231a0c;
+    box-shadow: 0 3px 0 #6e5220, 0 8px 14px -6px #000000aa;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #6e5220, 0 4px 8px -6px #000000aa;
+  }
+  .btn-ghost {
+    background: #ffffff10;
+    color: #c4af87;
+    border: 1px solid #ffffff22;
+    box-shadow: none;
+  }
+  .btn-ghost:hover {
+    background: #ffffff1c;
+  }
+  .btn-ghost:active {
+    transform: translateY(1px);
+  }
+  .btn-paper {
+    background: #ffffff55;
+    color: var(--ink);
+    border: 1px solid #2c201540;
+    box-shadow: none;
+  }
+  .btn-paper:hover {
+    background: #ffffff88;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-[15px];
+  }
+
+  /* ---------- หน้า Home: กระดาษแผ่นเดียว ไม่มีเงาซ้อน ---------- */
+  .sheet {
+    @apply relative rounded-sm px-5 py-5;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 26px, #2c201508 26px 27px),
+      linear-gradient(160deg, var(--manila-hi), var(--manila) 60%, var(--manila-sh));
+    box-shadow:
+      inset 0 1px 0 #ffffff66,
+      0 14px 26px -16px #000000aa;
+  }
+
+  /* หัวข้อใหญ่บนพื้นโต๊ะ */
+  .section-title {
+    font-family: var(--font-display), monospace;
+    @apply m-0 text-[clamp(20px,3.4vw,27px)] tracking-wide;
+    color: #f5e9cc;
+    text-shadow: 0 2px 0 #0007;
+  }
+  .section-lead {
+    @apply mt-1.5 max-w-[70ch] text-[14.5px];
+    color: #b6a179;
+  }
+
+  /* ป้ายเล็ก ๆ เช่น ระดับความยาก */
+  .chip {
+    font-family: var(--font-mono), monospace;
+    @apply inline-block rounded-[2px] border px-2 py-0.5 text-[11px] tracking-wide;
+    border-color: #2c201533;
+    background: #ffffff40;
+    color: var(--ink-soft);
+  }
+  .chip-dark {
+    border-color: #ffffff22;
+    background: #ffffff0d;
+    color: #b6a179;
+  }
+
+  /* ---------- แถบนำทางบนสุด ---------- */
+  .top-nav {
+    @apply sticky top-0 z-30 border-b backdrop-blur;
+    border-color: #ffffff14;
+    background: #150f0acc;
+  }
+  .nav-link {
+    font-family: var(--font-mono), monospace;
+    @apply rounded-[3px] px-2.5 py-1.5 text-[12px] tracking-wide;
+    color: #b6a179;
+  }
+  .nav-link:hover {
+    background: #ffffff12;
+    color: #f1e3c1;
+  }
+
+  /* ---------- บล็อกโค้ด SQL ในคู่มือ ---------- */
+  .sql-block {
+    @apply relative overflow-hidden rounded-md;
+    background: var(--term);
+    box-shadow:
+      0 12px 24px -16px #000000dd,
+      0 0 0 1px #ffffff12;
+  }
+  .sql-block pre {
+    @apply m-0 overflow-x-auto px-4 py-3.5 text-[13px] leading-[1.85];
+    font-family: var(--font-mono), monospace;
+    color: var(--term-fg);
+  }
+  .tok-kw {
+    color: #e0b04a;
+    font-weight: 600;
+  }
+  .tok-str {
+    color: #8ed4a6;
+  }
+  .tok-num {
+    color: #dd9a72;
+  }
+  .tok-fn {
+    color: #d7c07a;
+  }
+  .tok-comment {
+    color: #7d6b4c;
+    font-style: italic;
+  }
+
+  /* ---------- คอนโซล SQL ---------- */
+  .console-shell {
+    @apply mt-5 overflow-hidden rounded-md;
+    background: var(--term);
+    box-shadow:
+      0 20px 40px -18px #000000dd,
+      0 0 0 1px #ffffff12,
+      inset 0 1px 0 #ffffff10;
+    animation: rise 0.6s 0.06s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  .console-bar {
+    @apply flex items-center gap-2 px-3.5 py-2.5;
+    background: linear-gradient(180deg, #2a2117, #1b140d);
+    border-bottom: 1px solid #ffffff12;
+  }
+  .console-dot {
+    @apply h-2.5 w-2.5 rounded-full;
+    background: #4a3c28;
+  }
+  .console-dot[data-live="true"] {
+    background: var(--brass);
+    box-shadow: 0 0 9px var(--brass);
+  }
+
+  /* ---------- ลิ้นชักสมุดบันทึก ---------- */
+  .notebook-fab {
+    font-family: var(--font-mono), monospace;
+    @apply fixed bottom-5 right-5 z-30 flex cursor-pointer items-center gap-2 rounded-full px-4 py-2.5 text-[12.5px] font-semibold tracking-wide;
+    border: 1px solid #00000055;
+    background: linear-gradient(180deg, #d9ac4b, #b0842f);
+    color: #231a0c;
+    box-shadow: 0 3px 0 #6e5220, 0 10px 20px -8px #000000cc;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .notebook-fab:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #6e5220, 0 4px 10px -6px #000000aa;
+  }
+  .notebook-badge {
+    @apply grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[10.5px] leading-none;
+    background: var(--stamp);
+    color: #f5e9cc;
+  }
+
+  /* ฉากหลังตอนลิ้นชักเปิด */
+  .notebook-scrim {
+    @apply fixed inset-0 z-40;
+    background: #0d0905aa;
+    transition: opacity 0.28s ease, visibility 0s;
+  }
+  .notebook-scrim[data-open="false"] {
+    @apply pointer-events-none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.28s ease, visibility 0s 0.28s;
+  }
+
+  .notebook-drawer {
+    @apply fixed right-0 top-0 z-50 flex h-full w-[min(390px,90vw)] flex-col;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 26px, #2c201510 26px 27px),
+      linear-gradient(160deg, var(--manila-hi), var(--manila) 55%, var(--manila-sh));
+    box-shadow:
+      -20px 0 44px -16px #000000dd,
+      inset 1px 0 0 #ffffff55;
+    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), visibility 0s;
+  }
+  /* ปิดแล้วต้อง visibility:hidden ด้วย ไม่งั้นยัง tab เข้าไปโดนปุ่มที่เลื่อนออกไปนอกจอได้ */
+  .notebook-drawer[data-open="false"] {
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), visibility 0s 0.28s;
+  }
+
+  .note-card {
+    @apply relative rounded-sm py-2.5 pl-3.5 pr-3;
+    background: #ffffff4d;
+    border: 1px solid #2c201526;
+    border-left: 3px solid var(--brass);
+  }
+  /* ลิ้นชักแคบ ตัดบรรทัดยาวลงมาแทนเลื่อนแนวนอน จะได้เห็นคิวรีทั้งก้อนในตาเดียว */
+  .note-sql {
+    font-family: var(--font-mono), monospace;
+    @apply m-0 whitespace-pre-wrap break-words rounded-[3px] px-2.5 py-2 text-[12px] leading-[1.75];
+    background: var(--term);
+    color: var(--term-fg);
+  }
+
+  /* ---------- ข้อความสถานะ ---------- */
+  .msg {
+    font-family: var(--font-mono), monospace;
+    @apply mt-2.5 rounded-[3px] px-3 py-2 text-[12.5px];
+    border-left: 3px solid;
+  }
+  .msg-info {
+    color: #a3906b;
+    border-color: #ffffff22;
+    background: #ffffff08;
+  }
+  .msg-ok {
+    color: #8ed4a6;
+    border-color: var(--ok);
+    background: #3e7a5222;
+  }
+  .msg-error {
+    color: #e8837a;
+    border-color: var(--stamp);
+    background: #a8332a22;
+  }
+  /* บนกระดาษต้องใช้โทนเข้มแทน */
+  .on-paper .msg-info {
+    color: var(--ink-soft);
+    background: #00000008;
+  }
+  .on-paper .msg-ok {
+    color: #2c5a3c;
+    background: #3e7a5218;
+  }
+  .on-paper .msg-error {
+    color: #8c2c24;
+    background: #a8332a18;
+  }
+}
+
+/* ---------- animations ---------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: perspective(1600px) translateY(18px) rotateX(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slam {
+  0% {
+    transform: perspective(600px) rotateX(-65deg) rotate(-12deg) scale(2.6);
+    opacity: 0;
+  }
+  60% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: perspective(600px) rotateX(0) rotate(-12deg) scale(1);
+    opacity: 0.88;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* ============================================================
+   สไตล์เฉพาะของเกมนี้ — ห้องแฟ้ม (Filter Board) และกระดานผังคดี (Evidence Board)
+   ธีมและตัวแปรสีใช้ร่วมกับ globals.css ที่ยกมาจาก sql-detective
+   ============================================================ */
+
+:root {
+  --cork: #7a5a34;
+  --cork-dark: #5d4326;
+  --pin: #b8342a;
+  --note: #f6e9c4;
+  --note-2: #ffe9a8;
+  --steel: #1d1710;
+}
+
+@layer components {
+  /* ---------- ชั้นวางแฟ้ม ---------- */
+  .rack {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .file-chip {
+    font-family: var(--font-sans), sans-serif;
+    @apply flex cursor-pointer items-center gap-1.5 rounded-[3px] border-0 px-2.5 py-1.5 text-left text-[12.5px] leading-tight;
+    background: linear-gradient(180deg, #bca87c, #a08d64);
+    color: #3c3020;
+    box-shadow: inset 0 1px 0 #ffffff44;
+    transition: transform 0.14s ease, filter 0.14s ease;
+  }
+  .file-chip:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+  .file-chip[data-active="true"] {
+    background: linear-gradient(180deg, var(--manila-hi), var(--manila));
+    color: var(--ink);
+    box-shadow: inset 0 1px 0 #ffffff88, 0 0 0 2px var(--brass);
+  }
+  /* แฟ้มที่คดีปัจจุบันบอกใบ้ว่าน่าจะได้ใช้ */
+  .file-chip[data-hinted="true"]::after {
+    content: "";
+    @apply ml-1 inline-block h-1.5 w-1.5 rounded-full;
+    background: var(--stamp);
+  }
+
+  /* ---------- แผงประกอบคิวรี (โต๊ะทำงาน) ---------- */
+  .panel {
+    @apply rounded-[4px] p-3.5;
+    background: linear-gradient(170deg, #241c14, var(--steel));
+    box-shadow: inset 0 1px 0 #ffffff14, 0 10px 24px -16px #000;
+    color: var(--term-fg);
+  }
+
+  .panel-label {
+    font-family: var(--font-mono), monospace;
+    @apply mb-2 text-[10px] uppercase tracking-[2.4px] text-brass/80;
+  }
+
+  /* ป้ายแฟ้มที่ถูกเชื่อมเข้ามาในคิวรี */
+  .join-chip {
+    font-family: var(--font-sans), sans-serif;
+    @apply flex items-center gap-1.5 rounded-[3px] px-2 py-1 text-[12px];
+    background: #ffffff10;
+    border: 1px solid #ffffff1f;
+  }
+  .join-chip[data-mode="hasNot"] {
+    background: #b8342a22;
+    border-color: #b8342a66;
+  }
+
+  /* ---------- ตัวควบคุมในแผง ---------- */
+  .field {
+    font-family: var(--font-sans), sans-serif;
+    @apply rounded-[3px] px-2 py-1.5 text-[12.5px];
+    background: #ffffff0f;
+    border: 1px solid #ffffff26;
+    color: var(--term-fg);
+  }
+  .field:hover {
+    border-color: #ffffff40;
+  }
+  .field option {
+    background: var(--steel);
+    color: var(--term-fg);
+  }
+  .field::placeholder {
+    color: #ffffff55;
+  }
+  /* ปฏิทิน/นาฬิกาในฟิลด์ date/time เป็นไอคอนดำบนพื้นเข้ม มองไม่เห็น เลยกลับสีให้ */
+  .field::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+  }
+
+  .filter-row {
+    @apply flex flex-wrap items-center gap-1.5 rounded-[3px] p-1.5;
+    background: #ffffff08;
+  }
+
+  .icon-btn {
+    @apply flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-[3px] border-0 text-[13px] leading-none;
+    background: #ffffff12;
+    color: var(--term-fg);
+  }
+  .icon-btn:hover {
+    background: #ffffff24;
+  }
+  .icon-btn[data-danger="true"]:hover {
+    background: #b8342a55;
+  }
+
+  /* ---------- ตารางผลลัพธ์ ---------- */
+  .data-wrap {
+    @apply overflow-auto rounded-[3px];
+    max-height: 46vh;
+    background: #0f0b07;
+    border: 1px solid #ffffff1a;
+  }
+
+  .data-table {
+    font-family: var(--font-mono), monospace;
+    @apply w-full border-collapse text-[12px];
+  }
+  .data-table th {
+    @apply sticky top-0 z-10 cursor-pointer whitespace-nowrap px-2.5 py-2 text-left font-semibold;
+    background: #1c1610;
+    color: var(--brass);
+    border-bottom: 1px solid #ffffff22;
+  }
+  .data-table th:hover {
+    background: #262019;
+  }
+  .data-table th small {
+    @apply block text-[9.5px] font-normal uppercase tracking-[1.4px];
+    color: #ffffff55;
+  }
+  .data-table td {
+    @apply whitespace-nowrap px-2.5 py-1.5;
+    color: #e6d9bb;
+    border-bottom: 1px solid #ffffff0f;
+  }
+  .data-table tbody tr:hover td {
+    background: #ffffff0a;
+  }
+  .data-table td[data-dim="true"] {
+    color: #ffffff44;
+  }
+
+  /* ---------- กระดานผังคดี ---------- */
+  .board-surface {
+    @apply relative overflow-hidden rounded-[4px];
+    min-height: 60vh;
+    background:
+      radial-gradient(120% 90% at 50% 0%, #00000000 40%, #00000055 100%),
+      repeating-conic-gradient(#00000010 0% 25%, transparent 0% 50%) 0 0 / 8px 8px,
+      linear-gradient(160deg, var(--cork), var(--cork-dark));
+    box-shadow: inset 0 0 60px #00000066, inset 0 2px 0 #ffffff1a;
+  }
+
+  .pin-card {
+    @apply absolute w-[212px] select-none rounded-[2px] px-3 pb-2.5 pt-4 text-[12px];
+    background: linear-gradient(170deg, var(--note), #ecdcb2);
+    color: var(--ink);
+    box-shadow: 0 10px 18px -10px #000000cc, 0 2px 0 #00000022;
+    cursor: grab;
+    transition: box-shadow 0.15s ease;
+  }
+  .pin-card:active {
+    cursor: grabbing;
+  }
+  .pin-card[data-dragging="true"] {
+    box-shadow: 0 22px 34px -12px #000000dd;
+    z-index: 30;
+  }
+  /* หมุดปักหัวการ์ด */
+  .pin-card::before {
+    content: "";
+    @apply absolute left-1/2 top-1 h-3 w-3 -translate-x-1/2 rounded-full;
+    background: radial-gradient(circle at 35% 30%, #ff8a7a, var(--pin) 60%, #7a1d16);
+    box-shadow: 0 2px 3px #00000088;
+  }
+  .pin-card[data-mark="suspect"] {
+    background: linear-gradient(170deg, #f7d9cf, #eec3b4);
+    outline: 2px solid var(--stamp);
+  }
+  .pin-card[data-mark="cleared"] {
+    opacity: 0.62;
+    filter: saturate(0.5);
+  }
+  .pin-card[data-mark="cleared"] .pin-title {
+    text-decoration: line-through;
+  }
+  .pin-card[data-mark="key"] {
+    background: linear-gradient(170deg, var(--note-2), #f3cf7a);
+    outline: 2px solid var(--brass);
+  }
+  .pin-card[data-linking="true"] {
+    outline: 2px dashed var(--brass);
+  }
+
+  .pin-title {
+    font-family: var(--font-display), monospace;
+    @apply mb-1 text-[14px] leading-tight;
+  }
+
+  .pin-line {
+    @apply flex justify-between gap-2 text-[11px] leading-snug;
+    color: #5b4a33;
+  }
+  .pin-line b {
+    @apply font-semibold text-ink;
+  }
+
+  .pin-note {
+    font-family: var(--font-sans), sans-serif;
+    @apply mt-1.5 w-full resize-none rounded-[2px] px-1.5 py-1 text-[11px];
+    background: #00000010;
+    border: 1px dashed #00000030;
+    color: var(--ink);
+  }
+
+  .mark-btn {
+    @apply cursor-pointer rounded-[2px] border-0 px-1.5 py-0.5 text-[11px] leading-none;
+    background: #00000012;
+  }
+  .mark-btn[data-on="true"] {
+    background: var(--ink);
+    color: var(--manila-hi);
+  }
+
+  /* ---------- รายชื่อผู้ต้องสงสัย ---------- */
+  .suspect-chip {
+    font-family: var(--font-sans), sans-serif;
+    @apply flex cursor-pointer items-center gap-1.5 rounded-full border-0 px-3 py-1.5 text-[12.5px];
+    background: #ffffff12;
+    color: var(--term-fg);
+  }
+  .suspect-chip:hover {
+    background: #ffffff22;
+  }
+  .suspect-chip[data-state="cleared"] {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+  .suspect-chip[data-state="key"] {
+    background: var(--brass);
+    color: var(--steel);
+    font-weight: 600;
+  }
+
+  /* ---------- แถบสลับมุมมอง ---------- */
+  .view-tab {
+    font-family: var(--font-mono), monospace;
+    @apply cursor-pointer rounded-[3px] border-0 px-3.5 py-2 text-[12px] font-semibold tracking-wide;
+    background: #ffffff10;
+    color: #d9c79d;
+  }
+  .view-tab[data-active="true"] {
+    background: var(--manila);
+    color: var(--ink);
+  }
+  .view-tab .badge {
+    @apply ml-1.5 inline-block rounded-full px-1.5 text-[10px];
+    background: var(--stamp);
+    color: #fff;
+  }
+}
