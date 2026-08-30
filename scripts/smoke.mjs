@@ -18,16 +18,26 @@ const URL = process.env.URL ?? "http://localhost:3000/play";
 
 const text = (el) => el.evaluate((n) => n.textContent?.trim() ?? "");
 
-/** หาปุ่มจากข้อความบนปุ่ม — เทียบแบบ "มีคำนี้อยู่" เพราะปุ่มหลายอันมีตัวเลขต่อท้าย */
-async function clickByText(page, selector, needle) {
-  const els = await page.$$(selector);
-  for (const el of els) {
-    if ((await text(el)).includes(needle)) {
-      await el.click();
-      return true;
+/**
+ * หาปุ่มจากข้อความบนปุ่ม — เทียบแบบ "มีคำนี้อยู่" เพราะปุ่มหลายอันมีตัวเลขต่อท้าย
+ *
+ * รอจนกว่าปุ่มจะโผล่จริง ไม่ใช่มองรอบเดียวแล้วยอมแพ้ — หลายจุดในเกมเปลี่ยนมุมมองด้วย
+ * useEffect หลังคลิก ปุ่มที่ต้องการเลยมาช้ากว่าข้อความที่เพิ่ง waitForFunction ไปหนึ่งเฟรม
+ */
+async function clickByText(page, selector, needle, timeout = 8000) {
+  const until = Date.now() + timeout;
+  for (;;) {
+    for (const el of await page.$$(selector)) {
+      if ((await text(el)).includes(needle)) {
+        await el.click();
+        return true;
+      }
     }
+    if (Date.now() > until) {
+      throw new Error(`ไม่เจอ ${selector} ที่มีข้อความ "${needle}"`);
+    }
+    await new Promise((r) => setTimeout(r, 100));
   }
-  throw new Error(`ไม่เจอ ${selector} ที่มีข้อความ "${needle}"`);
 }
 
 const main = async () => {

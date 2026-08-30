@@ -16,7 +16,7 @@
   --manila-hi: #f1e3c1;
   --manila-sh: #c9b487;
   --ink: #2c2015;
-  --ink-soft: #6e5b41;
+  --ink-soft: #5f4e35;
   --stamp: #a8332a;
   --brass: #c99a3e;
   --ok: #3e7a52;
@@ -87,6 +87,12 @@
   .eyebrow {
     font-family: var(--font-mono), monospace;
     @apply mb-1.5 text-[10.5px] uppercase tracking-[2.6px] text-stamp;
+  }
+  /* บนพื้นโต๊ะเข้ม สีตราปั๊มแดงเข้มจะจมหาย ต้องดันให้สว่างขึ้น */
+  .eyebrow-dark {
+    font-family: var(--font-mono), monospace;
+    @apply mb-2 text-[10.5px] uppercase tracking-[2.6px];
+    color: #d9705f;
   }
 
   .paper-title {
@@ -179,16 +185,30 @@
       0 14px 26px -16px #000000aa;
   }
 
-  /* หัวข้อใหญ่บนพื้นโต๊ะ */
+  /* หัวข้อบนกระดาษ manila — ต้องเป็นหมึกเข้ม ไม่ใช่สีอ่อนแบบตัวหนังสือบนพื้นโต๊ะ
+     ขีดเส้นใต้บาง ๆ ให้ดูเหมือนหัวข้อที่ขีดไว้ในแฟ้ม */
   .section-title {
+    font-family: var(--font-display), monospace;
+    @apply relative m-0 pb-2 text-[clamp(20px,3.4vw,27px)] tracking-wide;
+    color: var(--ink);
+    text-shadow: 0 1px 0 #ffffff66;
+  }
+  .section-title::after {
+    content: "";
+    @apply absolute bottom-0 left-0 block h-px w-full;
+    background: linear-gradient(90deg, #2c201566, #2c201514 70%, transparent);
+  }
+  .section-lead {
+    @apply mt-2.5 max-w-[70ch] text-[14.5px] leading-relaxed;
+    color: var(--ink-soft);
+  }
+
+  /* หัวข้อโทนอ่อน สำหรับที่ที่วางบนพื้นโต๊ะเข้มจริง ๆ */
+  .section-title-dark {
     font-family: var(--font-display), monospace;
     @apply m-0 text-[clamp(20px,3.4vw,27px)] tracking-wide;
     color: #f5e9cc;
     text-shadow: 0 2px 0 #0007;
-  }
-  .section-lead {
-    @apply mt-1.5 max-w-[70ch] text-[14.5px];
-    color: #b6a179;
   }
 
   /* ป้ายเล็ก ๆ เช่น ระดับความยาก */
@@ -203,6 +223,52 @@
     border-color: #ffffff22;
     background: #ffffff0d;
     color: #b6a179;
+  }
+  /* ป้ายทักษะบนกระดาษ — หมึกเข้มบนพื้นที่เข้มขึ้นนิดหน่อย ไม่ใช่โทนอ่อนแบบ chip-dark */
+  .chip-skill {
+    font-family: var(--font-mono), monospace;
+    @apply inline-block whitespace-nowrap rounded-[2px] border px-2 py-0.5 text-[11px] tracking-wide;
+    border-color: #2c20152e;
+    background: #2c201510;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- รายการคดีบนกระดาษ ---------- */
+  .case-item {
+    @apply flex items-baseline gap-2.5 rounded-[3px] px-2 py-1.5 text-[13px];
+    color: var(--ink);
+    border-bottom: 1px dashed #2c201524;
+    transition: background 0.14s ease;
+  }
+  .case-item:hover {
+    background: #2c20150f;
+  }
+  .case-no {
+    font-family: var(--font-mono), monospace;
+    @apply shrink-0 text-[11px] font-semibold;
+    color: #7d5b1c;
+  }
+
+  /* ---------- การ์ดบนกระดาษ — คู่หูโทนหมึกของ .panel ที่เป็นโทนมืด ---------- */
+  .card-paper {
+    @apply rounded-[4px] p-3.5;
+    background: linear-gradient(170deg, #ffffff5e, #ffffff24);
+    border: 1px solid #2c201526;
+    box-shadow: inset 0 1px 0 #ffffff80;
+    color: var(--ink);
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+  }
+  .card-paper:hover {
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 #ffffff99, 0 8px 16px -12px #000000aa;
+  }
+  .card-paper-title {
+    @apply m-0 mb-1 text-[14.5px] font-semibold;
+    color: var(--ink);
+  }
+  .card-paper-text {
+    @apply m-0 text-[12.5px] leading-relaxed;
+    color: var(--ink-soft);
   }
 
   /* ---------- แถบนำทางบนสุด ---------- */
@@ -686,4 +752,229 @@
     background: var(--stamp);
     color: #fff;
   }
+}
+
+
+/* ============================================================
+   ชั้น UX/Animation — feedback เล็ก ๆ ที่ทำให้เกมรู้สึกมีชีวิต
+   ============================================================ */
+
+@layer components {
+  /* ---------- แถบความคืบหน้าปิดคดี ---------- */
+  .progress-track {
+    @apply relative h-1.5 w-[120px] overflow-hidden rounded-full;
+    background: #ffffff14;
+    box-shadow: inset 0 1px 2px #0006;
+  }
+  .progress-fill {
+    @apply absolute inset-y-0 left-0 rounded-full;
+    background: linear-gradient(90deg, #b0842f, var(--brass) 60%, #f0cd76);
+    box-shadow: 0 0 10px #c99a3e88;
+    transition: width 0.7s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  /* ---------- ป้ายแจ้งเตือนลอย ---------- */
+  /* วางมุมล่างซ้าย — บนสุดกลางจอมันทับแท็บสำนวนกับแถบสลับมุมมองพอดี */
+  .toast-stack {
+    @apply pointer-events-none fixed bottom-4 left-4 z-[60] flex flex-col items-start gap-2 pr-4;
+  }
+  .toast {
+    font-family: var(--font-mono), monospace;
+    @apply pointer-events-auto flex max-w-[92vw] items-center gap-2.5 rounded-[4px] px-4 py-2.5 text-[13px];
+    background: linear-gradient(160deg, var(--manila-hi), var(--manila) 70%, var(--manila-sh));
+    color: var(--ink);
+    border-left: 4px solid var(--brass);
+    box-shadow: 0 16px 30px -14px #000000cc, inset 0 1px 0 #ffffff88;
+    animation: toast-in 0.36s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+  }
+  .toast[data-leaving="true"] {
+    animation: toast-out 0.24s ease forwards;
+  }
+  .toast[data-tone="ok"] {
+    border-left-color: var(--ok);
+  }
+  .toast[data-tone="error"] {
+    border-left-color: var(--stamp);
+  }
+
+  /* ---------- ฉากฉลองตอนปิดคดี ---------- */
+  .confetti-layer {
+    @apply pointer-events-none fixed inset-0 z-[55] overflow-hidden;
+  }
+  .confetti-bit {
+    @apply absolute top-[-14px] h-2.5 w-1.5 rounded-[1px];
+    animation: confetti-fall linear forwards;
+  }
+
+  /* ---------- เอฟเฟกต์ปุ่ม/แถว ---------- */
+  .btn,
+  .btn-paper,
+  .btn-ghost {
+    transition: transform 0.1s, box-shadow 0.1s, filter 0.15s, background 0.15s;
+  }
+  .btn:hover:not(:active) {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+  }
+
+  /* กระดาษสั่นเวลาตอบผิด */
+  .shake {
+    animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  /* แถวผลลัพธ์ทยอยโผล่ทีละแถว */
+  .data-table tbody tr {
+    animation: row-in 0.26s ease both;
+  }
+  .data-table tbody tr td {
+    transition: background 0.12s ease;
+  }
+  .data-table tbody tr:hover td {
+    background: #ffffff12;
+  }
+
+  /* ปุ่มปักหมุด: เด้งตอนกด + ติ๊กถูกเป็นสีเขียว */
+  .icon-btn {
+    transition: transform 0.12s cubic-bezier(0.2, 1.6, 0.4, 1), background 0.15s;
+  }
+  .icon-btn:hover {
+    transform: scale(1.15);
+  }
+  .icon-btn:active {
+    transform: scale(0.88);
+  }
+  .icon-btn[data-pinned="true"] {
+    background: #3e7a5244;
+    color: #8ed4a6;
+  }
+
+  /* แท็บกระดานกระตุกตอนมีการ์ดใหม่ */
+  .view-tab {
+    transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+  }
+  .view-tab:hover:not([data-active="true"]) {
+    background: #ffffff1c;
+  }
+  .view-tab[data-bump="true"] {
+    animation: bump 0.42s cubic-bezier(0.2, 1.5, 0.4, 1);
+  }
+  .view-tab .badge {
+    transition: transform 0.2s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  .view-tab[data-bump="true"] .badge {
+    transform: scale(1.35);
+  }
+
+  /* การ์ดใหม่บนกระดาน ตกลงมาปัก */
+  .pin-card {
+    animation: pin-drop 0.34s cubic-bezier(0.2, 1.15, 0.35, 1) both;
+    transition: box-shadow 0.15s ease, outline-color 0.15s ease, opacity 0.2s ease,
+      filter 0.2s ease;
+  }
+  .pin-card:hover {
+    box-shadow: 0 16px 26px -12px #000000dd, 0 2px 0 #00000022;
+  }
+  .pin-card[data-dragging="true"] {
+    animation: none;
+  }
+  .pin-card[data-linking="true"] {
+    animation: linking-pulse 1.1s ease-in-out infinite;
+  }
+
+  /* เชือกแดงค่อย ๆ ลากออกมา */
+  .link-line {
+    animation: draw-line 0.4s ease both;
+  }
+
+  /* แฟ้มที่คดีใบ้ไว้ กะพริบเบา ๆ เรียกสายตา */
+  .file-chip[data-hinted="true"]::after {
+    animation: hint-blink 2s ease-in-out infinite;
+  }
+
+  /* ตราปิดคดี — ให้มีแสงวาบตอนปั๊มลง */
+  .stamp-mark::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0;
+    box-shadow: 0 0 0 0 #a8332a88;
+    animation: stamp-ring 0.6s 0.3s ease-out both;
+  }
+
+  /* จุดโหลดกระพริบ */
+  .load-dots span {
+    @apply mx-[2px] inline-block h-1.5 w-1.5 rounded-full;
+    background: var(--brass);
+    animation: dot-pulse 1.1s ease-in-out infinite;
+  }
+  .load-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .load-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  /* คำใบ้ที่เพิ่งเปิด ค่อย ๆ คลี่ลงมา */
+  .hint-line {
+    animation: unfold 0.32s ease both;
+  }
+
+  /* ป้ายคีย์ลัด */
+  .kbd {
+    font-family: var(--font-mono), monospace;
+    @apply inline-block rounded-[3px] px-1.5 py-px text-[10px] leading-[1.5];
+    background: #ffffff14;
+    border: 1px solid #ffffff28;
+    color: #d9c79d;
+  }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateX(-14px) scale(0.97); }
+}
+@keyframes confetti-fall {
+  from { transform: translateY(0) rotate(0deg); opacity: 1; }
+  to   { transform: translateY(105vh) rotate(720deg); opacity: 0.15; }
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes bump {
+  0%   { transform: none; }
+  35%  { transform: translateY(-4px) scale(1.06); }
+  70%  { transform: translateY(1px) scale(0.99); }
+  100% { transform: none; }
+}
+@keyframes pin-drop {
+  from { opacity: 0; transform: translateY(-22px) scale(1.06) rotate(-2deg); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes linking-pulse {
+  0%, 100% { outline-color: var(--brass); }
+  50%      { outline-color: #f3d78d; }
+}
+@keyframes draw-line {
+  from { stroke-dashoffset: var(--len, 400); }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes hint-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(1.4); }
+}
+@keyframes stamp-ring {
+  from { box-shadow: 0 0 0 0 #a8332aaa; }
+  to   { box-shadow: 0 0 0 22px #a8332a00; }
+}
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1; transform: translateY(-3px); }
+}
+@keyframes unfold {
+  from { opacity: 0; transform: translateY(-6px); max-height: 0; }
+  to   { opacity: 1; transform: none; max-height: 200px; }
 }

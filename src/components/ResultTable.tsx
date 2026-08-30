@@ -83,10 +83,13 @@ export default function ResultTable({
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i}>
+                // ทยอยโผล่ทีละแถว แต่หน่วงแค่ 12 แถวแรก แถวที่ 13 ขึ้นไปโผล่พร้อมกัน
+                // ไม่งั้นผลลัพธ์ร้อยแถวจะรอนานเป็นวินาทีกว่าจะเห็นครบ
+                <tr key={i} style={{ animationDelay: `${Math.min(i, 12) * 22}ms` }}>
                   <td>
                     <button
                       className="icon-btn"
+                      data-pinned={pinnedRows.has(i)}
                       onClick={() => onPin(i)}
                       title={pinnedRows.has(i) ? "ปักไปแล้ว (กดอีกครั้งเพื่อปักซ้ำ)" : "ปักหมุดขึ้นกระดาน"}
                     >

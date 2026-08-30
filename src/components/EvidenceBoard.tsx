@@ -142,9 +142,12 @@ export default function EvidenceBoard({ board, setBoard }: Props) {
             const a = center(l.from);
             const b = center(l.to);
             if (!a || !b) return null;
+            // ให้เชือกวาดตัวเองออกมาจากต้นทาง — dasharray เท่าความยาวเส้นพอดี
+            const len = Math.hypot(b.x - a.x, b.y - a.y);
             return (
               <line
                 key={l.id}
+                className="link-line"
                 x1={a.x}
                 y1={a.y}
                 x2={b.x}
@@ -152,6 +155,8 @@ export default function EvidenceBoard({ board, setBoard }: Props) {
                 stroke="#b8342a"
                 strokeWidth={2}
                 strokeOpacity={0.75}
+                strokeDasharray={len}
+                style={{ ["--len" as string]: len } as React.CSSProperties}
               />
             );
           })}

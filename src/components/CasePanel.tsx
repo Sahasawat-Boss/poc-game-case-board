@@ -15,7 +15,8 @@ interface Props {
   board: BoardState;
   /** ชื่อคนของรอบเล่นนี้ เรียงตาม id (id 1 อยู่ที่ index 0) */
   names: string[];
-  onSolved: () => void;
+  onSolved: (title: string) => void;
+  onWrong: () => void;
 }
 
 export default function CasePanel({
@@ -28,14 +29,18 @@ export default function CasePanel({
   board,
   names,
   onSolved,
+  onWrong,
 }: Props) {
   const [hintsOpen, setHintsOpen] = useState(0);
   const [message, setMessage] = useState<{ tone: MessageTone; text: string } | null>(null);
+  // ตอบผิดแล้วกระดาษสั่นทีนึง — ให้รู้ทันทีโดยไม่ต้องกวาดตาหาข้อความ
+  const [shake, setShake] = useState(false);
 
   // เปลี่ยนคดีแล้วต้องล้างคำใบ้กับข้อความเดิม ไม่งั้นคดีใหม่จะเปิดมาพร้อมคำใบ้ของคดีเก่า
   useEffect(() => {
     setHintsOpen(0);
     setMessage(null);
+    setShake(false);
   }, [current.n]);
 
   /** ผู้ต้องสงสัยที่อยู่บนกระดานตอนนี้ — คนที่ถูก "ตัดออก" ไปแล้วไม่นับ */
@@ -61,12 +66,17 @@ export default function CasePanel({
     const ok = submit(given);
     if (ok) {
       setMessage({ tone: "ok", text: "ปิดคดีเรียบร้อย — สำนวนนี้จบแล้ว" });
-      onSolved();
+      onSolved(current.title);
     } else {
       setMessage({
         tone: "error",
         text: "ยังไม่ใช่คนนี้ ลองกลับไปดูเงื่อนไขในสำนวนอีกรอบว่าครบทุกข้อหรือยัง",
       });
+      onWrong();
+      setShake(false);
+      // รอเฟรมถัดไปค่อยติดคลาส ไม่งั้นตอบผิดซ้ำ ๆ แล้วอนิเมชันจะไม่รีสตาร์ต
+      requestAnimationFrame(() => setShake(true));
+      window.setTimeout(() => setShake(false), 480);
     }
   };
 
@@ -89,7 +99,7 @@ export default function CasePanel({
         ))}
       </div>
 
-      <article className="paper on-paper">
+      <article className={`paper on-paper${shake ? " shake" : ""}`}>
         {solved && <span className="stamp-mark">ปิดคดีแล้ว</span>}
         <p className="eyebrow">
           สำนวนที่ {current.n} · {current.skill}
@@ -110,7 +120,7 @@ export default function CasePanel({
           {current.hints.slice(0, hintsOpen).map((h, i) => (
             <p
               key={i}
-              className="mb-1.5 text-[12.5px] leading-relaxed text-ink-soft"
+              className="hint-line mb-1.5 text-[12.5px] leading-relaxed text-ink-soft"
               dangerouslySetInnerHTML={{ __html: `<b>ใบที่ ${i + 1}:</b> ${h}` }}
             />
           ))}

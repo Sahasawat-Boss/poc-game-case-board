@@ -7,7 +7,7 @@ const config: Config = {
       colors: {
         desk: { DEFAULT: "#2A2018", dark: "#150F0A" },
         manila: { DEFAULT: "#E4D2A9", hi: "#F1E3C1", sh: "#C9B487" },
-        ink: { DEFAULT: "#2C2015", soft: "#6E5B41" },
+        ink: { DEFAULT: "#2C2015", soft: "#5F4E35" },
         stamp: "#A8332A",
         brass: "#C99A3E",
         okgreen: "#3E7A52",
